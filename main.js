@@ -485,14 +485,6 @@ class Enemy {
     p2.velocity = new Vec(aNorm.x + bTang.x, aNorm.y + bTang.y);
   }
 
-  isNearby(target) {
-    let d = this.radius + target.radius;
-    return target.p.x >= (this.p.x - d) &&
-        target.p.x <= (this.p.x + d) &&
-        target.p.y >= (this.p.y - d) &&
-        target.p.y <= (this.p.y + d);
-  }
-
   isCollision(target) {
     let d = this.radius + target.radius;
     return Math.sqrt((this.p.x - target.p.x) ** 2 + (this.p.y - target.p.y) ** 2) < d;
@@ -750,7 +742,7 @@ class GameStatus {
         `Time : ${this.clearTime}\n`
             + `White : ${this.whiteRatio} %\n`
             + `Score : ${this.score}\n`
-            + touchMode ? 'Restart : Double tap' : 'Restart : [R]',
+            + (touchMode ? 'Restart : Double tap' : 'Restart : [R]'),
         GAME_MAP.MAP_WIDTH / 2,
         GAME_MAP.MAP_HEIGHT / 2,
         Math.floor(GAME_MAP.BLOCK_SIZE),
