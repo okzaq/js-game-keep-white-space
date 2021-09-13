@@ -7,7 +7,7 @@ const ENEMY_SPEED = 3.0;
 const PLAYER_ROTATE_SPEED = 0.8;
 const PLAYER_MOVE_SPEED = 4.0;
 const BULLET_MOVE_SPEED = 8.0;
-const BULLET_SHOT_INTERVAL = 100;  // ms
+const BULLET_SHOT_INTERVAL = 200;  // ms
 
 const GAME_MAP = {
   MAP_HEIGHT : 0,
@@ -301,6 +301,10 @@ class Bullet {
     this.ctx.beginPath();
     this.ctx.fillStyle = 'white';
     this.ctx.strokeStyle = 'rgba(0, 0, 0, 0.5)';
+    this.ctx.shadowColor = "black";
+    this.ctx.shadowOffsetX = 5;
+    this.ctx.shadowOffsetY = 5;
+    this.ctx.shadowBlur = 10;
     this.ctx.arc(
         this.p.x,
         this.p.y,
@@ -308,8 +312,13 @@ class Bullet {
         0,
         2 * Math.PI,
         true);
-    this.ctx.fill();
     this.ctx.stroke();
+    this.ctx.fill();
+
+    this.ctx.shadowColor = 'rgba(255, 255, 255, 0)';
+    this.ctx.shadowOffsetX = 0;
+    this.ctx.shadowOffsetY = 0;
+    this.ctx.shadowBlur = 0;
   }
 }
 
