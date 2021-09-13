@@ -751,7 +751,7 @@ class GameStatus {
         `Time : ${this.clearTime}\n`
             + `White : ${this.whiteRatio} %\n`
             + `Score : ${this.score}\n`
-            + (touchMode ? 'Restart : Double tap' : 'Restart : [R]'),
+            + (touchMode ? 'Restart : Double tap' : 'Restart : [SPACE]'),
         GAME_MAP.MAP_WIDTH / 2,
         GAME_MAP.MAP_HEIGHT / 2,
         Math.floor(GAME_MAP.BLOCK_SIZE),
@@ -844,10 +844,10 @@ function render() {
 }
 
 function updatePlayerDirection(e, isPressed) {
-  if (gameStatus.isGameOver && ['r', 'R'].includes(e.key)) {
+  if (gameStatus.isGameOver && ' ' === e.key) {
     location.href = location.href;
   }
-  if (!gameStatus.isGameStart && [' '].includes(e.key)) {
+  if (!gameStatus.isGameStart && ' ' === e.key) {
     gameStatus.gameStart();
   }
   switch (e.keyCode) {
