@@ -164,19 +164,25 @@ class Player {
 
   updatePosition() {
     if (gameStatus.isGameOver) return;
+    let cur = now();
+    let dt = (cur - this.lastMovedAt) / 1000.0;
     if (touchMode) {
       if (this.targetRadian !== null) {
-        let s = Math.sin(this.targetRadian - this.radian);
-        this.h = s > 0 ? 1 : -1;
+        let s1 = Math.sin(this.targetRadian - this.radian);
+        this.h = s1 > 0 ? 1 : -1;
+        this.radian += this.h * 2 * Math.PI * PLAYER_ROTATE_SPEED * dt;
+        let s2 = Math.sin(this.targetRadian - this.radian);
+        if ((s1 >= 0 && s2 <= 0) || (s1 <= 0 && s2 >= 0)) {
+          this.radian = this.targetRadian;
+        }
         this.v = 1;
       } else {
         this.h = 0;
         this.v = 0;
       }
+    } else {
+      this.radian += this.h * 2 * Math.PI * PLAYER_ROTATE_SPEED * dt;
     }
-    let cur = now();
-    let dt = (cur - this.lastMovedAt) / 1000.0;
-    this.radian += this.h * 2 * Math.PI * PLAYER_ROTATE_SPEED * dt;
     let dl = this.v * GAME_MAP.BLOCK_SIZE * PLAYER_MOVE_SPEED * dt;
     this.p.slide(dl, this.radian);
     this.putInBox(GAME_MAP.MAP_WIDTH, GAME_MAP.MAP_HEIGHT);
@@ -190,6 +196,9 @@ class Player {
 
   draw() {
     this.ctx.clearRect(0, 0, GAME_MAP.MAP_WIDTH, GAME_MAP.MAP_HEIGHT);
+    if (gameStatus.isGameOver) {
+      return;
+    }
     this.ctx.beginPath();
     this.ctx.fillStyle = "white";
     this.ctx.strokeStyle = 'black';
@@ -559,7 +568,7 @@ class GameMap {
     this.ctx.arc(
         enemy.p.x,
         enemy.p.y,
-        enemy.radius,
+        enemy.radius * 1.5,
         0,
         2 * Math.PI,
         true);
@@ -855,7 +864,7 @@ function updatePlayerDirection(e, isPressed) {
 let touchStartX = 0;
 let touchStartY = 0;
 let isFastTouch = false;
-let swipeThreshold = 5;
+let swipeThreshold = 10;
 function touchStart(e) {
   if (gameStatus.isGameOver) {
     if (isFastTouch) {
@@ -869,14 +878,26 @@ function touchStart(e) {
   }
   touchStartX = e.touches[0].pageX;
   touchStartY = e.touches[0].pageY;
+  touchMoveX = touchStartX;
+  touchMoveY = touchStartY;
 }
 
+let touchMoveX = 0;
+let touchMoveY = 0;
 function touchMove(e) {
-  let dx = e.changedTouches[0].pageX - touchStartX;
-  let dy = e.changedTouches[0].pageY - touchStartY;
-  if (Math.abs(dx) < swipeThreshold && Math.abs(dy) < swipeThreshold) {
+  let currentX = e.changedTouches[0].pageX;
+  let currentY = e.changedTouches[0].pageY;
+  let dx = currentX - touchStartX;
+  let dy = currentY - touchStartY;
+  if (Math.abs(dx) <= swipeThreshold
+      || Math.abs(dy) <= swipeThreshold) {
+    console.log(`dx : ${dx}, dy : ${dy}`);
     player.updateTargetRadian(null);
-  } else {
+  } else if (Math.abs(currentX - touchMoveX) > swipeThreshold
+      || Math.abs(currentY - touchMoveY) > swipeThreshold) {
+    console.log(`x : ${currentX - touchMoveX}, y : ${currentY - touchMoveY}`);
+    touchMoveX = currentX;
+    touchMoveY = currentY;
     player.updateTargetRadian(Math.atan2(dy, dx));
   }
 }
